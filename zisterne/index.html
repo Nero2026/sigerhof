@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zisterne</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <section class="card">
+      <div class="topRow">
+        <a class="btnSmall btnBack" href="../index.html">Zurück</a>
+        <div class="h2">Zisterne</div>
+        <div style="width:84px"></div>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div id="status" class="statusLine statusOk">STATUS: OK</div>
+    </section>
+
+    <section class="card">
+      <div class="title">Messwerte</div>
+      <div style="height:12px"></div>
+
+      <div class="metricsGrid">
+        <div class="metricCard">
+          <div class="metricK">Füllgrad</div>
+          <div id="mPercent" class="metricV">--</div>
+        </div>
+
+        <div class="metricCard">
+          <div class="metricK">Volumen</div>
+          <div id="mLiter" class="metricV">--</div>
+        </div>
+
+        <div class="metricCard">
+          <div class="metricK">Kapazität</div>
+          <div id="mCap" class="metricV">--</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="canvasCard">
+        <div class="canvasTitle">Zisterne</div>
+        <canvas id="c" class="zCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title">Steuerung</div>
+      <div style="height:12px"></div>
+
+      <div class="grid2">
+        <button class="btn" id="plus" type="button">+ 1 %</button>
+        <button class="btn" id="minus" type="button">- 1 %</button>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div class="grid3">
+        <button class="btnSmall" id="p0" type="button">0 %</button>
+        <button class="btnSmall" id="p50" type="button">50 %</button>
+        <button class="btnSmall" id="p100" type="button">100 %</button>
+      </div>
+
+      <div class="hintText">
+        Tastatur: Pfeil hoch runter, Home, End
+      </div>
+    </section>
+
+  </div>
+
+  <script src="zisterne.js"></script>
+</body>
+</html>

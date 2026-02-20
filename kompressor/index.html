@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kompressor</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Main -->
+    <section id="mainView" class="card">
+      <div class="title">Kompressor</div>
+      <div class="sub">Steuerung über ESP im WLAN</div>
+
+      <div style="height:14px"></div>
+
+      <div id="statusBox" class="statusBox statusOff" role="status" aria-live="polite">
+        Ausgeschaltet
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div class="grid2">
+        <button id="btnOn" class="btn" type="button">Ein</button>
+        <button id="btnOff" class="btn" type="button">Aus</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="topRow">
+        <a class="btnSmall btnBack" href="../index.html">Zurück</a>
+        <button id="btnDetails" class="btnSmall" type="button">Details</button>
+      </div>
+    </section>
+
+    <!-- Details -->
+    <section id="detailView" class="card hidden">
+      <div class="topRow">
+        <button id="btnBack" class="btnSmall btnBack" type="button">Zurück</button>
+        <div class="h2">Details</div>
+        <div style="width:84px"></div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <label for="espUrl">ESP Basis URL</label>
+      <input id="espUrl" type="text" inputmode="url" placeholder="http://192.168.1.50">
+
+      <div style="height:10px"></div>
+
+      <div class="grid2">
+        <button id="btnSave" class="btnSmall" type="button">Speichern</button>
+        <button id="btnRefresh" class="btnSmall" type="button">Status abfragen</button>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div class="grid2">
+        <button id="btnExportCsv" class="btnSmall" type="button">CSV export</button>
+        <button id="btnClearLog" class="btnSmall" type="button">Monitor leeren</button>
+      </div>
+
+      <div id="log" class="log" aria-label="Monitor"></div>
+    </section>
+
+  </div>
+
+  <script src="kompressor.js"></script>
+</body>
+</html>
