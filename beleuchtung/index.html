@@ -5,20 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Beleuchtung</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 340px;
+    }
+
+    .switchBtn {
+      padding: 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .switchOff {
+      background-color: #444;
+      color: white;
+    }
+
+    .switchOn {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .statusText {
+      font-size: 14px;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
   <div class="app">
     <section class="card">
+
       <div class="title">Beleuchtung</div>
-      <div class="sub">Platzhalter Seite</div>
+      <div class="sub">Test Licht Steuerung</div>
       <div class="divider"></div>
 
       <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.4">
-        Hier kannst du spaeter einzelne Zonen, Zeitsteuerung, Szenen usw einbauen.
+        Hier kannst du spaeter Zonen oder Szenen integrieren.
       </p>
 
+      <div style="flex:1"></div>
+
+      <button id="testLightBtn" class="switchBtn switchOff">
+        Licht AUS
+      </button>
+      <div id="statusText" class="statusText">
+        Status: AUS
+      </div>
+
       <div style="height:14px"></div>
+
       <a class="menuBtn" href="../index.html">Zurück</a>
+
     </section>
   </div>
 
