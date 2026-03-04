@@ -1,5 +1,5 @@
 const WORKER_URL = "https://test.remo-bossart.workers.dev"
-const WEB_TOKEN = "x_!1848!_x"
+const WEB_TOKEN = "DEIN_WEB_TOKEN"
 
 const btn = document.getElementById("testLightBtn")
 const statusText = document.getElementById("statusText")
@@ -20,7 +20,22 @@ function updateUI() {
   }
 }
 
+async function getStatus() {
+  const res = await fetch(WORKER_URL + "/status", {
+    method: "GET",
+    headers: {
+      "x-token": WEB_TOKEN
+    }
+  })
+
+  const data = await res.json()
+
+  isOn = data.on
+  updateUI()
+}
+
 async function switchLight(turnOn) {
+
   const route = turnOn ? "/on" : "/off"
 
   const res = await fetch(WORKER_URL + route, {
@@ -33,6 +48,9 @@ async function switchLight(turnOn) {
   if (!res.ok) {
     throw new Error("Schalten fehlgeschlagen")
   }
+
+  isOn = turnOn
+  updateUI()
 }
 
 btn.addEventListener("click", async () => {
@@ -40,13 +58,13 @@ btn.addEventListener("click", async () => {
 
   try {
     await switchLight(!isOn)
-    isOn = !isOn
-    updateUI()
-  } catch (e) {
+  } catch {
     alert("Fehler beim Schalten")
-  } finally {
-    btn.disabled = false
   }
+
+  btn.disabled = false
 })
 
-updateUI()
+getStatus()
+
+setInterval(getStatus, 5000)
