@@ -1,5 +1,5 @@
 const WORKER_URL = "https://test.remo-bossart.workers.dev"
-const WEB_TOKEN = "DEIN_WEB_TOKEN"
+const WEB_TOKEN = "x_!1848!_x"
 
 const btn = document.getElementById("testLightBtn")
 const statusText = document.getElementById("statusText")
