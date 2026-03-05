@@ -51,6 +51,21 @@
         Hier kannst du spaeter Zonen oder Szenen integrieren.
       </p>
 
+      <div style="height:12px"></div>
+
+      <div id="configPanel" class="canvasCard">
+        <div class="canvasTitle">Verbindung</div>
+        <div style="height:10px"></div>
+
+        <label for="proxyUrl">Proxy URL</label>
+        <input id="proxyUrl" type="text" inputmode="url" placeholder="https://licht-proxy.example.workers.dev">
+
+        <div style="height:10px"></div>
+        <button id="saveConfigBtn" class="btnSmall" type="button">Speichern</button>
+
+        <div id="configHint" class="statusText">Proxy URL eintragen</div>
+      </div>
+
       <div style="flex:1"></div>
 
       <button id="testLightBtn" class="switchBtn switchOff">
