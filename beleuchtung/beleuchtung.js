@@ -1,119 +1,74 @@
-const KEY_PROXY_URL = "beleuchtung_proxy_url"
-const DEFAULT_PROXY_URL = "https://licht-proxy.example.workers.dev"
+const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
 
-const btn = document.getElementById("testLightBtn")
-const statusText = document.getElementById("statusText")
-const proxyUrlInput = document.getElementById("proxyUrl")
-const saveConfigBtn = document.getElementById("saveConfigBtn")
-const configHint = document.getElementById("configHint")
+const controls = [
+  { key: "test-shelly", label: "Test-Shelly", btn: document.getElementById("btnTestShelly") },
+  { key: "platzlampe", label: "Platzlampe", btn: document.getElementById("btnPlatzlampe") },
+  { key: "scheune-vorne", label: "Licht Scheune vorne", btn: document.getElementById("btnScheuneVorne") }
+]
 
-let isOn = false
-
-function normalizeBaseUrl(url) {
-  return (url || "").trim().replace(/\/+$/, "")
-}
-
-function getConfig() {
-  const proxyUrl = normalizeBaseUrl(localStorage.getItem(KEY_PROXY_URL) || DEFAULT_PROXY_URL)
-  return { proxyUrl }
-}
-
-function updateUI() {
+function setButtonState(button, isOn) {
   if (isOn) {
-    btn.classList.remove("switchOff")
-    btn.classList.add("switchOn")
-    btn.textContent = "Licht EIN"
-    statusText.textContent = "Status: EIN"
+    button.classList.remove("switchOff")
+    button.classList.add("switchOn")
   } else {
-    btn.classList.remove("switchOn")
-    btn.classList.add("switchOff")
-    btn.textContent = "Licht AUS"
-    statusText.textContent = "Status: AUS"
+    button.classList.remove("switchOn")
+    button.classList.add("switchOff")
   }
-}
-
-function showConfigStatus(msg) {
-  configHint.textContent = msg
-}
-
-function loadConfigUi() {
-  proxyUrlInput.value = getConfig().proxyUrl
-}
-
-function saveConfig() {
-  const proxyUrl = normalizeBaseUrl(proxyUrlInput.value)
-  if (!proxyUrl) {
-    showConfigStatus("Bitte Proxy URL eintragen")
-    return false
-  }
-  localStorage.setItem(KEY_PROXY_URL, proxyUrl)
-  showConfigStatus("Konfiguration gespeichert")
-  return true
 }
 
 async function fetchWithTimeout(url, ms, options) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), ms)
   try {
-    return await fetch(url, { ...options, signal: controller.signal })
+    return await fetch(url, { ...options, signal: controller.signal, cache: "no-store" })
   } finally {
     clearTimeout(timer)
   }
 }
 
-async function apiGet(route) {
-  const cfg = getConfig()
-  if (!cfg.proxyUrl) {
-    throw new Error("Keine Proxy URL konfiguriert")
-  }
-
-  const res = await fetchWithTimeout(cfg.proxyUrl + route, 4000, {
-    method: "GET",
-    cache: "no-store"
-  })
-
-  if (!res.ok) {
-    throw new Error("HTTP " + res.status)
-  }
-
+async function apiGet(path) {
+  const res = await fetchWithTimeout(PROXY_URL + path, 5000, { method: "GET" })
+  if (!res.ok) throw new Error("HTTP " + res.status)
   return res
 }
 
-async function getStatus() {
+async function refreshStatus(control) {
   try {
-    const res = await apiGet("/status")
+    const res = await apiGet(`/api/${encodeURIComponent(control.key)}/status`)
     const data = await res.json()
-    isOn = Boolean(data && data.on)
-    updateUI()
-    showConfigStatus("Verbunden")
-  } catch (err) {
-    showConfigStatus("Statusfehler: " + (err && err.message ? err.message : "Unbekannt"))
-  }
-}
-
-async function switchLight(turnOn) {
-  const route = turnOn ? "/on" : "/off"
-  await apiGet(route)
-  isOn = turnOn
-  updateUI()
-}
-
-btn.addEventListener("click", async () => {
-  btn.disabled = true
-  try {
-    await switchLight(!isOn)
+    setButtonState(control.btn, Boolean(data && data.on))
   } catch {
-    alert("Fehler beim Schalten")
+    setButtonState(control.btn, false)
   }
-  btn.disabled = false
-})
+}
 
-saveConfigBtn.addEventListener("click", async () => {
-  if (!saveConfig()) return
-  await getStatus()
-})
+async function switchLight(control, turnOn) {
+  const route = turnOn ? "on" : "off"
+  await apiGet(`/api/${encodeURIComponent(control.key)}/${route}`)
+  setButtonState(control.btn, turnOn)
+}
 
-loadConfigUi()
-saveConfig()
-getStatus()
-setInterval(getStatus, 5000)
+async function refreshAll() {
+  for (const c of controls) {
+    await refreshStatus(c)
+  }
+}
+
+function bindClicks() {
+  for (const c of controls) {
+    c.btn.addEventListener("click", async () => {
+      c.btn.disabled = true
+      const isOn = c.btn.classList.contains("switchOn")
+      try {
+        await switchLight(c, !isOn)
+      } catch {
+        alert(`Fehler beim Schalten: ${c.label}`)
+      }
+      c.btn.disabled = false
+    })
+  }
+}
+
+bindClicks()
+refreshAll()
+setInterval(refreshAll, 5000)

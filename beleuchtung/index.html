@@ -6,79 +6,45 @@
   <title>Beleuchtung</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .card {
-      display: flex;
-      flex-direction: column;
-      min-height: 340px;
-    }
+    .card { display: flex; flex-direction: column; min-height: 340px; }
 
     .switchBtn {
-      padding: 14px;
-      border-radius: 8px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
       border: none;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
       cursor: pointer;
       transition: 0.2s ease;
     }
 
-    .switchOff {
-      background-color: #444;
-      color: white;
-    }
+    .switchOff { background-color: #444; color: white; }
+    .switchOn { background-color: #2ecc71; color: white; }
 
-    .switchOn {
-      background-color: #2ecc71;
-      color: white;
-    }
-
-    .statusText {
-      font-size: 14px;
-      margin-top: 6px;
-      color: var(--muted);
+    .buttonStack {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
   </style>
 </head>
 <body>
   <div class="app">
     <section class="card">
-
       <div class="title">Beleuchtung</div>
-      <div class="sub">Test Licht Steuerung</div>
       <div class="divider"></div>
 
-      <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.4">
-        Hier kannst du spaeter Zonen oder Szenen integrieren.
-      </p>
-
-      <div style="height:12px"></div>
-
-      <div id="configPanel" class="canvasCard">
-        <div class="canvasTitle">Verbindung</div>
-        <div style="height:10px"></div>
-
-        <label for="proxyUrl">Proxy URL</label>
-        <input id="proxyUrl" type="text" inputmode="url" placeholder="https://licht-proxy.example.workers.dev">
-
-        <div style="height:10px"></div>
-        <button id="saveConfigBtn" class="btnSmall" type="button">Speichern</button>
-
-        <div id="configHint" class="statusText">Proxy URL eintragen</div>
-      </div>
-
-      <div style="flex:1"></div>
-
-      <button id="testLightBtn" class="switchBtn switchOff">
-        Licht AUS
-      </button>
-      <div id="statusText" class="statusText">
-        Status: AUS
+      <div class="buttonStack">
+        <button id="btnTestShelly" class="switchBtn switchOff" type="button">Test-Shelly</button>
+        <button id="btnPlatzlampe" class="switchBtn switchOff" type="button">Platzlampe</button>
+        <button id="btnScheuneVorne" class="switchBtn switchOff" type="button">Licht Scheune vorne</button>
       </div>
 
       <div style="height:14px"></div>
-
       <a class="menuBtn" href="../index.html">Zurück</a>
-
     </section>
   </div>
 
