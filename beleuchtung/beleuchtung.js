@@ -38,7 +38,7 @@ async function refreshStatus(control) {
     const data = await res.json()
     setButtonState(control.btn, Boolean(data && data.on))
   } catch {
-    setButtonState(control.btn, false)
+    // Keep last known state when polling fails.
   }
 }
 
