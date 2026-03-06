@@ -79,25 +79,32 @@ async function switchDevice(control) {
   const route = shouldTurnOn ? "on" : "off"
 
   try {
+    // Optimistic UI: immediate feedback on click.
+    setButtonState(control.btn, shouldTurnOn)
+
     const cmdRes = await runRequest(`/api/${encodeURIComponent(control.key)}/${route}`)
     if (!cmdRes) return
 
-    // Update only after real status confirmation from backend.
-    inFlight = true
+    // Silent confirmation from backend. If it fails, keep optimistic state.
     try {
+      inFlight = true
       const statusRes = await fetchWithTimeout(
         PROXY_URL + `/api/${encodeURIComponent(control.key)}/status`,
         REQUEST_TIMEOUT_MS,
         { method: "GET", cache: "no-store" }
       )
-      if (!statusRes.ok) throw new Error("HTTP " + statusRes.status)
-      const statusData = await statusRes.json()
-      setButtonState(control.btn, Boolean(statusData && statusData.on))
+      if (statusRes.ok) {
+        const statusData = await statusRes.json()
+        setButtonState(control.btn, Boolean(statusData && statusData.on))
+      }
+    } catch {
+      // No popup noise; next poll will reconcile.
     } finally {
       inFlight = false
     }
   } catch {
-    alert(`Fehler beim Schalten: ${control.label}`)
+    // Revert on hard command failure, no alert popup.
+    setButtonState(control.btn, !shouldTurnOn)
   } finally {
     const waitMs = Math.max(0, (debounceUntil.get(control.key) || 0) - Date.now())
     if (waitMs > 0) {
