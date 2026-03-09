@@ -5,22 +5,12 @@ const CLICK_DEBOUNCE_MS = 600
 
 const controls = [
   {
-    key: "test-shelly",
-    label: "Test-Shelly",
-    btn: document.getElementById("btnTestShelly"),
-    regionBtn: null
-  },
-  {
     key: "platzlampe",
-    label: "Platzlampe",
-    btn: document.getElementById("btnPlatzlampe"),
-    regionBtn: document.getElementById("regionPlatzlampe")
+    button: document.getElementById("regionPlatzlampe")
   },
   {
     key: "scheune-vorne",
-    label: "Licht Scheune vorne",
-    btn: document.getElementById("btnScheuneVorne"),
-    regionBtn: document.getElementById("regionScheuneVorne")
+    button: document.getElementById("regionScheuneVorne")
   }
 ]
 
@@ -28,38 +18,17 @@ let inFlight = false
 let isSwitching = false
 let pollingTimer = null
 const debounceUntil = new Map()
-const tabList = document.getElementById("tabList")
-const tabGraphic = document.getElementById("tabGraphic")
-const viewList = document.getElementById("viewList")
-const viewGraphic = document.getElementById("viewGraphic")
 
 function setRegionState(button, isOn) {
   if (!button) return
   button.classList.toggle("active", isOn)
 }
 
-function setButtonState(button, isOn) {
-  if (!button) return
-  if (isOn) {
-    button.classList.remove("switchOff")
-    button.classList.add("switchOn")
-  } else {
-    button.classList.remove("switchOn")
-    button.classList.add("switchOff")
-  }
-}
-
 function updateButtonsEnabled() {
   const now = Date.now()
   for (const control of controls) {
     const blockedUntil = debounceUntil.get(control.key) || 0
-    const disabled = isSwitching || now < blockedUntil
-    if (control.btn) {
-      control.btn.disabled = disabled
-    }
-    if (control.regionBtn) {
-      control.regionBtn.disabled = disabled
-    }
+    control.button.disabled = isSwitching || now < blockedUntil
   }
 }
 
@@ -91,9 +60,7 @@ async function getStatus(control) {
   if (!res) return null
 
   const data = await res.json()
-  const isOn = Boolean(data && data.on)
-  setButtonState(control.btn, isOn)
-  setRegionState(control.regionBtn, isOn)
+  setRegionState(control.button, Boolean(data && data.on))
   return data
 }
 
@@ -108,18 +75,15 @@ async function switchDevice(control) {
   debounceUntil.set(control.key, now + CLICK_DEBOUNCE_MS)
   updateButtonsEnabled()
 
-  const shouldTurnOn = !control.btn.classList.contains("switchOn")
+  const shouldTurnOn = !control.button.classList.contains("active")
   const route = shouldTurnOn ? "on" : "off"
 
   try {
-    // Optimistic UI: immediate feedback on click.
-    setButtonState(control.btn, shouldTurnOn)
-    setRegionState(control.regionBtn, shouldTurnOn)
+    setRegionState(control.button, shouldTurnOn)
 
     const cmdRes = await runRequest(`/api/${encodeURIComponent(control.key)}/${route}`)
     if (!cmdRes) return
 
-    // Silent confirmation from backend. If it fails, keep optimistic state.
     try {
       inFlight = true
       const statusRes = await fetchWithTimeout(
@@ -129,19 +93,13 @@ async function switchDevice(control) {
       )
       if (statusRes.ok) {
         const statusData = await statusRes.json()
-        const isOn = Boolean(statusData && statusData.on)
-        setButtonState(control.btn, isOn)
-        setRegionState(control.regionBtn, isOn)
+        setRegionState(control.button, Boolean(statusData && statusData.on))
       }
-    } catch {
-      // No popup noise; next poll will reconcile.
     } finally {
       inFlight = false
     }
   } catch {
-    // Revert on hard command failure, no alert popup.
-    setButtonState(control.btn, !shouldTurnOn)
-    setRegionState(control.regionBtn, !shouldTurnOn)
+    setRegionState(control.button, !shouldTurnOn)
   } finally {
     const waitMs = Math.max(0, (debounceUntil.get(control.key) || 0) - Date.now())
     if (waitMs > 0) {
@@ -178,34 +136,12 @@ function stopPolling() {
   pollingTimer = null
 }
 
-function activateTab(name) {
-  const showList = name === "list"
-  tabList.classList.toggle("active", showList)
-  tabGraphic.classList.toggle("active", !showList)
-  viewList.classList.toggle("active", showList)
-  viewGraphic.classList.toggle("active", !showList)
+for (const control of controls) {
+  control.button.addEventListener("click", () => {
+    switchDevice(control)
+  })
 }
 
-function bindClicks() {
-  for (const control of controls) {
-    if (control.btn) {
-      control.btn.addEventListener("click", () => {
-        switchDevice(control)
-      })
-    }
-    if (control.regionBtn) {
-      control.regionBtn.addEventListener("click", () => {
-        switchDevice(control)
-      })
-    }
-  }
-
-  tabList.addEventListener("click", () => activateTab("list"))
-  tabGraphic.addEventListener("click", () => activateTab("graphic"))
-}
-
-bindClicks()
-activateTab("list")
 updateButtonsEnabled()
 pollOnce()
 startPolling()

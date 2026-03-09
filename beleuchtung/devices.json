@@ -1,0 +1,14 @@
+{
+  "devices": [
+    {
+      "key": "test-shelly",
+      "name": "Test-Shelly",
+      "enabled": true
+    },
+    {
+      "key": "stall-licht",
+      "name": "Stall Licht",
+      "enabled": false
+    }
+  ]
+}
