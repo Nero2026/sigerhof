@@ -5,6 +5,10 @@ const CLICK_DEBOUNCE_MS = 600
 
 const controls = [
   {
+    key: "test-shelly",
+    button: document.getElementById("regionTestShelly")
+  },
+  {
     key: "platzlampe",
     button: document.getElementById("regionPlatzlampe")
   },
