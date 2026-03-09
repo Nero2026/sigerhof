@@ -2,6 +2,7 @@ const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
 const POLL_MS = 5000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
+const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
 
 const controls = [
   {
@@ -28,14 +29,30 @@ let inFlight = false
 let isSwitching = false
 let pollingTimer = null
 const debounceUntil = new Map()
-const tabList = document.getElementById("tabList")
-const tabGraphic = document.getElementById("tabGraphic")
-const viewList = document.getElementById("viewList")
-const viewGraphic = document.getElementById("viewGraphic")
 
 function setRegionState(button, isOn) {
   if (!button) return
   button.classList.toggle("active", isOn)
+}
+
+function applyControlState(control, isOn) {
+  setButtonState(control.btn, isOn)
+  setRegionState(control.regionBtn, isOn)
+}
+
+function publishControlState(control, isOn) {
+  try {
+    localStorage.setItem(
+      STATE_EVENT_KEY,
+      JSON.stringify({
+        key: control.key,
+        on: Boolean(isOn),
+        at: Date.now()
+      })
+    )
+  } catch {
+    // Ignore sync issues.
+  }
 }
 
 function setButtonState(button, isOn) {
@@ -92,8 +109,7 @@ async function getStatus(control) {
 
   const data = await res.json()
   const isOn = Boolean(data && data.on)
-  setButtonState(control.btn, isOn)
-  setRegionState(control.regionBtn, isOn)
+  applyControlState(control, isOn)
   return data
 }
 
@@ -113,8 +129,8 @@ async function switchDevice(control) {
 
   try {
     // Optimistic UI: immediate feedback on click.
-    setButtonState(control.btn, shouldTurnOn)
-    setRegionState(control.regionBtn, shouldTurnOn)
+    applyControlState(control, shouldTurnOn)
+    publishControlState(control, shouldTurnOn)
 
     const cmdRes = await runRequest(`/api/${encodeURIComponent(control.key)}/${route}`)
     if (!cmdRes) return
@@ -130,8 +146,8 @@ async function switchDevice(control) {
       if (statusRes.ok) {
         const statusData = await statusRes.json()
         const isOn = Boolean(statusData && statusData.on)
-        setButtonState(control.btn, isOn)
-        setRegionState(control.regionBtn, isOn)
+        applyControlState(control, isOn)
+        publishControlState(control, isOn)
       }
     } catch {
       // No popup noise; next poll will reconcile.
@@ -140,8 +156,8 @@ async function switchDevice(control) {
     }
   } catch {
     // Revert on hard command failure, no alert popup.
-    setButtonState(control.btn, !shouldTurnOn)
-    setRegionState(control.regionBtn, !shouldTurnOn)
+    applyControlState(control, !shouldTurnOn)
+    publishControlState(control, !shouldTurnOn)
   } finally {
     const waitMs = Math.max(0, (debounceUntil.get(control.key) || 0) - Date.now())
     if (waitMs > 0) {
@@ -178,14 +194,6 @@ function stopPolling() {
   pollingTimer = null
 }
 
-function activateTab(name) {
-  const showList = name === "list"
-  tabList.classList.toggle("active", showList)
-  tabGraphic.classList.toggle("active", !showList)
-  viewList.classList.toggle("active", showList)
-  viewGraphic.classList.toggle("active", !showList)
-}
-
 function bindClicks() {
   for (const control of controls) {
     if (control.btn) {
@@ -199,13 +207,22 @@ function bindClicks() {
       })
     }
   }
-
-  tabList.addEventListener("click", () => activateTab("list"))
-  tabGraphic.addEventListener("click", () => activateTab("graphic"))
 }
 
+window.addEventListener("storage", (event) => {
+  if (event.key !== STATE_EVENT_KEY || !event.newValue) return
+
+  try {
+    const payload = JSON.parse(event.newValue)
+    const control = controls.find((item) => item.key === payload.key)
+    if (!control) return
+    applyControlState(control, Boolean(payload.on))
+  } catch {
+    // Ignore malformed sync events.
+  }
+})
+
 bindClicks()
-activateTab("list")
 updateButtonsEnabled()
 pollOnce()
 startPolling()

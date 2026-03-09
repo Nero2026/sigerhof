@@ -2,6 +2,7 @@ const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
 const POLL_MS = 5000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
+const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
 
 const controls = [
   {
@@ -26,6 +27,21 @@ const debounceUntil = new Map()
 function setRegionState(button, isOn) {
   if (!button) return
   button.classList.toggle("active", isOn)
+}
+
+function publishControlState(control, isOn) {
+  try {
+    localStorage.setItem(
+      STATE_EVENT_KEY,
+      JSON.stringify({
+        key: control.key,
+        on: Boolean(isOn),
+        at: Date.now()
+      })
+    )
+  } catch {
+    // Ignore sync issues.
+  }
 }
 
 function updateButtonsEnabled() {
@@ -84,6 +100,7 @@ async function switchDevice(control) {
 
   try {
     setRegionState(control.button, shouldTurnOn)
+    publishControlState(control, shouldTurnOn)
 
     const cmdRes = await runRequest(`/api/${encodeURIComponent(control.key)}/${route}`)
     if (!cmdRes) return
@@ -97,13 +114,16 @@ async function switchDevice(control) {
       )
       if (statusRes.ok) {
         const statusData = await statusRes.json()
-        setRegionState(control.button, Boolean(statusData && statusData.on))
+        const isOn = Boolean(statusData && statusData.on)
+        setRegionState(control.button, isOn)
+        publishControlState(control, isOn)
       }
     } finally {
       inFlight = false
     }
   } catch {
     setRegionState(control.button, !shouldTurnOn)
+    publishControlState(control, !shouldTurnOn)
   } finally {
     const waitMs = Math.max(0, (debounceUntil.get(control.key) || 0) - Date.now())
     if (waitMs > 0) {
@@ -139,6 +159,19 @@ function stopPolling() {
   clearInterval(pollingTimer)
   pollingTimer = null
 }
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== STATE_EVENT_KEY || !event.newValue) return
+
+  try {
+    const payload = JSON.parse(event.newValue)
+    const control = controls.find((item) => item.key === payload.key)
+    if (!control) return
+    setRegionState(control.button, Boolean(payload.on))
+  } catch {
+    // Ignore malformed sync events.
+  }
+})
 
 for (const control of controls) {
   control.button.addEventListener("click", () => {
