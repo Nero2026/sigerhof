@@ -3,6 +3,7 @@ const POLL_MS = 5000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
 const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
+const STATE_CACHE_KEY = "sigerhof:beleuchtung:state-cache"
 const CHANNEL_NAME = "sigerhof-beleuchtung-sync"
 const INSTANCE_ID = `${Date.now()}-${Math.random().toString(16).slice(2)}`
 
@@ -55,6 +56,7 @@ function applyDeviceState(key, nextState) {
   const prevState = getKnownState(key)
   const merged = { ...prevState, ...nextState, on: Boolean(nextState.on) }
   deviceState.set(key, merged)
+  persistStateCache()
 
   for (const element of getElements(key)) {
     setButtonState(element, merged.on)
@@ -79,6 +81,42 @@ function buildTitle(element, state) {
   }
 
   return parts.join(" | ")
+}
+
+function persistStateCache() {
+  const payload = {}
+  for (const [key, state] of deviceState.entries()) {
+    payload[key] = {
+      on: Boolean(state.on),
+      inputOn: typeof state.inputOn === "boolean" ? state.inputOn : null,
+      online: typeof state.online === "boolean" ? state.online : null,
+      source: state.source || "",
+      updated: state.updated || null
+    }
+  }
+
+  try {
+    localStorage.setItem(STATE_CACHE_KEY, JSON.stringify(payload))
+  } catch {
+    // Ignore cache persistence issues.
+  }
+}
+
+function hydrateStateCache() {
+  try {
+    const raw = localStorage.getItem(STATE_CACHE_KEY)
+    if (!raw) return
+
+    const payload = JSON.parse(raw)
+    if (!payload || typeof payload !== "object") return
+
+    for (const key of deviceElements.keys()) {
+      if (!payload[key]) continue
+      applyDeviceState(key, { key, ...payload[key] })
+    }
+  } catch {
+    // Ignore malformed cached state.
+  }
 }
 
 function publishState(key, state, origin) {
@@ -288,6 +326,18 @@ if (channel) {
 }
 
 registerControls()
+hydrateStateCache()
 updateButtonsEnabled()
 pollOnce()
 startPolling()
+
+window.addEventListener("pageshow", () => {
+  updateButtonsEnabled()
+  pollOnce()
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return
+  updateButtonsEnabled()
+  pollOnce()
+})
