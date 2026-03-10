@@ -1,0 +1,9 @@
+name = "beleuchtung-proxy"
+main = "src/index.js"
+compatibility_date = "2026-03-05"
+
+[vars]
+# Optional: restrict browser origin, e.g. "https://your-app.example.com"
+# ALLOWED_ORIGIN = "*"
+# Non-secret upstream base URL, e.g. "https://test.remo-bossart.workers.dev"
+# UPSTREAM_BASE_URL = "https://your-upstream.example.workers.dev"

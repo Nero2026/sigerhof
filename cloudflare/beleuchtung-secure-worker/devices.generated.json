@@ -1,0 +1,23 @@
+﻿[
+    {
+        "key":  "test-shelly",
+        "id":  "d0cf13cb8708",
+        "channel":  0,
+        "enabled":  true,
+        "auth_ref":  "main"
+    },
+    {
+        "key":  "platzlampe",
+        "id":  "28372f2018f8",
+        "channel":  0,
+        "enabled":  true,
+        "auth_ref":  "main"
+    },
+    {
+        "key":  "scheune-vorne",
+        "id":  "28372f2018f8",
+        "channel":  1,
+        "enabled":  true,
+        "auth_ref":  "main"
+    }
+]

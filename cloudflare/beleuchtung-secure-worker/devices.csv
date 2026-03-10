@@ -1,0 +1,4 @@
+key,name,id,channel,host,auth_ref,enabled
+test-shelly,Test-Shelly,d0cf13cb8708,0,,main,true
+platzlampe,Platzlampe,28372f2018f8,0,,main,true
+scheune-vorne,Licht Scheune vorne,28372f2018f8,1,,main,true
