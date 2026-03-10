@@ -119,6 +119,21 @@ function hydrateStateCache() {
   }
 }
 
+function hydrateLastEvent() {
+  try {
+    const raw = localStorage.getItem(STATE_EVENT_KEY)
+    if (!raw) return
+
+    const payload = JSON.parse(raw)
+    if (!payload || !payload.key) return
+    if (!deviceElements.has(payload.key)) return
+
+    applyDeviceState(payload.key, payload)
+  } catch {
+    // Ignore malformed sync state.
+  }
+}
+
 function publishState(key, state, origin) {
   const payload = {
     key,
@@ -327,6 +342,7 @@ if (channel) {
 
 registerControls()
 hydrateStateCache()
+hydrateLastEvent()
 updateButtonsEnabled()
 pollOnce()
 startPolling()
