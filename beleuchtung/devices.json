@@ -6,9 +6,14 @@
       "enabled": true
     },
     {
-      "key": "stall-licht",
-      "name": "Stall Licht",
-      "enabled": false
+      "key": "platzlampe",
+      "name": "Platzlampe",
+      "enabled": true
+    },
+    {
+      "key": "scheune-vorne",
+      "name": "Licht Scheune vorne",
+      "enabled": true
     }
   ]
 }
