@@ -3,21 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sigerhof</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="js/auth.js"></script>
+  <title>Beleuchtung</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/auth.js"></script>
+  <style>
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 340px;
+    }
+
+    .tabBar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tabLink {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 900;
+      transition: background 0.18s ease, transform 0.08s ease, border-color 0.18s ease;
+    }
+
+    .tabLink.active {
+      background: linear-gradient(180deg, rgba(76, 131, 255, 0.38), rgba(76, 131, 255, 0.2));
+      border-color: rgba(116, 159, 255, 0.7);
+    }
+
+    .tabLink:active {
+      transform: translateY(1px);
+    }
+
+    .buttonStack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .switchBtn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      cursor: pointer;
+      color: white;
+      transition: 0.18s ease;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .switchBtn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .switchOff {
+      background: linear-gradient(180deg, #3c455e, #2b3246);
+    }
+
+    .switchOn {
+      background: linear-gradient(180deg, #e7cc35, #d6ad18);
+      color: #1f1b08;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
     <section class="card">
-      <div class="title">Sigerhof</div>
+      <div class="title">Beleuchtung</div>
       <div class="divider"></div>
-      <div class="menu">
-        <a class="menuBtn" href="kompressor/index.html">Kompressor</a>
-        <a class="menuBtn" href="zisterne/index.html">Zisterne</a>
-        <a class="menuBtn" href="beleuchtung/index.html">Beleuchtung</a>
+
+      <div class="tabBar">
+        <a class="tabLink active" href="index.html">Liste</a>
+        <a class="tabLink" href="grafik.html">Grafik</a>
       </div>
+
+      <div class="buttonStack">
+        <button id="btnTestShelly" class="switchBtn switchOff" data-device-key="test-shelly" type="button">Test-Shelly</button>
+        <button id="btnPlatzlampe" class="switchBtn switchOff" data-device-key="platzlampe" type="button">Platzlampe</button>
+        <button id="btnScheuneVorne" class="switchBtn switchOff" data-device-key="scheune-vorne" type="button">Licht Scheune vorne</button>
+      </div>
+
+      <div style="height:14px"></div>
+      <a class="menuBtn" href="../index.html">Zurück</a>
     </section>
   </div>
+
+  <script type="module" src="beleuchtung.js?v=20260312a"></script>
 </body>
 </html>

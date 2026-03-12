@@ -1,0 +1,19 @@
+﻿{
+    "devices":  [
+                    {
+                        "key":  "test-shelly",
+                        "name":  "Test-Shelly",
+                        "enabled":  true
+                    },
+                    {
+                        "key":  "platzlampe",
+                        "name":  "Platzlampe",
+                        "enabled":  true
+                    },
+                    {
+                        "key":  "scheune-vorne",
+                        "name":  "Licht Scheune vorne",
+                        "enabled":  true
+                    }
+                ]
+}
