@@ -14,6 +14,16 @@
       "key": "scheune-vorne",
       "name": "Licht Scheune vorne",
       "enabled": true
+    },
+    {
+      "key": "scheune-hinten",
+      "name": "Licht Scheune hinten",
+      "enabled": true
+    },
+    {
+      "key": "heustock-mitte",
+      "name": "Heustock mitte",
+      "enabled": true
     }
   ]
 }
