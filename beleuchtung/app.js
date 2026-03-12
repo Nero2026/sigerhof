@@ -1,5 +1,5 @@
 const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
-const POLL_MS = 5000
+const POLL_MS = 2000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
 const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
@@ -41,6 +41,30 @@ function getKnownState(key) {
   return deviceState.get(key) || { on: false }
 }
 
+function hasBoolean(value) {
+  return typeof value === "boolean"
+}
+
+function resolveEffectiveOn(prevState, nextState) {
+  const hasOn = hasBoolean(nextState.on)
+  const hasInput = hasBoolean(nextState.inputOn)
+
+  if (hasOn && hasInput) {
+    const prevOn = Boolean(prevState.on)
+    const prevInput = hasBoolean(prevState.inputOn) ? prevState.inputOn : null
+    const relayChanged = nextState.on !== prevOn
+    const inputChanged = prevInput === null ? false : nextState.inputOn !== prevInput
+
+    if (relayChanged) return nextState.on
+    if (inputChanged) return nextState.inputOn
+    return nextState.on
+  }
+
+  if (hasOn) return nextState.on
+  if (hasInput) return nextState.inputOn
+  return Boolean(prevState.on)
+}
+
 function setButtonState(element, isOn) {
   if (element.classList.contains("switchBtn")) {
     element.classList.toggle("switchOn", isOn)
@@ -54,7 +78,11 @@ function setButtonState(element, isOn) {
 
 function applyDeviceState(key, nextState) {
   const prevState = getKnownState(key)
-  const merged = { ...prevState, ...nextState, on: Boolean(nextState.on) }
+  const merged = {
+    ...prevState,
+    ...nextState,
+    on: resolveEffectiveOn(prevState, nextState)
+  }
   deviceState.set(key, merged)
   persistStateCache()
 
