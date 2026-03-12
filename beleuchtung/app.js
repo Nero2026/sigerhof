@@ -1,5 +1,5 @@
 const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
-const POLL_MS = 2000
+const POLL_MS = 3000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
 const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
@@ -244,6 +244,34 @@ async function getStatus(key) {
   return nextState
 }
 
+async function getAllStatus() {
+  if (isSwitching) return null
+  const res = await runRequest("/api/status-all")
+  if (!res) return null
+
+  const data = await res.json()
+  if (!data || typeof data !== "object") return null
+
+  for (const key of deviceElements.keys()) {
+    const state = data[key]
+    if (!state || typeof state !== "object") continue
+
+    const nextState = {
+      key,
+      on: Boolean(state.on),
+      inputOn: typeof state.inputOn === "boolean" ? state.inputOn : null,
+      online: Boolean(state.online),
+      source: state.source || "poll",
+      updated: state.updated || null
+    }
+
+    applyDeviceState(key, nextState)
+    publishState(key, nextState, "poll")
+  }
+
+  return data
+}
+
 async function confirmStatus(key) {
   inFlight = true
   try {
@@ -325,13 +353,10 @@ async function switchDevice(key) {
 
 async function pollOnce() {
   if (isSwitching || inFlight) return
-  for (const key of deviceElements.keys()) {
-    if (isSwitching || inFlight) return
-    try {
-      await getStatus(key)
-    } catch {
-      // Keep last known state on polling error.
-    }
+  try {
+    await getAllStatus()
+  } catch {
+    // Keep last known state on polling error.
   }
 }
 
