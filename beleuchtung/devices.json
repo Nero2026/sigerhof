@@ -1,48 +1,12 @@
 {
   "devices": [
     {
-      "key": "test-shelly",
-      "name": "Licht Heustock vorne",
-      "enabled": true,
-      "graphic": {
-        "ariaLabel": "Heustock vorne",
-        "style": "left:71.4%; top:21.9%; width:8.2%; height:53.7%;"
-      }
-    },
-    {
       "key": "platzlampe",
       "name": "Licht Hausplatz",
       "enabled": true,
       "graphic": {
         "ariaLabel": "Hausplatz",
-        "style": "left:16.6%; top:0.4%; width:53.7%; height:15.2%;"
-      }
-    },
-    {
-      "key": "scheune-vorne",
-      "name": "Licht Scheune vorne",
-      "enabled": true,
-      "graphic": {
-        "ariaLabel": "Scheune vorne",
-        "style": "left:60.8%; top:17.4%; width:9.4%; height:58.7%;"
-      }
-    },
-    {
-      "key": "scheune-hinten",
-      "name": "Licht Scheune hinten",
-      "enabled": true,
-      "graphic": {
-        "ariaLabel": "Scheune hinten",
-        "style": "left:29.3%; top:17.6%; width:11.8%; height:58.9%;"
-      }
-    },
-    {
-      "key": "heustock-mitte",
-      "name": "Licht Heustock mitte",
-      "enabled": true,
-      "graphic": {
-        "ariaLabel": "Heustock mitte",
-        "style": "left:41.4%; top:17.6%; width:18.9%; height:58.9%;"
+        "style": "left:16.8%; top:0.4%; width:54.0%; height:15.8%;"
       }
     },
     {
@@ -51,7 +15,43 @@
       "enabled": true,
       "graphic": {
         "ariaLabel": "Zisterne",
-        "style": "left:28.3%; top:76.8%; width:28.8%; height:19.6%;"
+        "style": "left:28.4%; top:76.6%; width:29.0%; height:19.8%;"
+      }
+    },
+    {
+      "key": "scheune-vorne",
+      "name": "Licht Scheune vorne",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Scheune vorne",
+        "style": "left:60.6%; top:16.8%; width:9.8%; height:59.4%;"
+      }
+    },
+    {
+      "key": "scheune-hinten",
+      "name": "Licht Scheune hinten",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Scheune hinten",
+        "style": "left:29.1%; top:16.8%; width:12.0%; height:59.4%;"
+      }
+    },
+    {
+      "key": "test-shelly",
+      "name": "Licht Heustock vorne",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Heustock vorne",
+        "style": "left:70.9%; top:16.8%; width:8.9%; height:59.4%;"
+      }
+    },
+    {
+      "key": "heustock-mitte",
+      "name": "Licht Heustock mitte",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Heustock mitte",
+        "style": "left:41.1%; top:16.8%; width:19.3%; height:59.4%;"
       }
     }
   ]
