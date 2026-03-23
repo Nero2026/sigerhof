@@ -2,28 +2,57 @@
   "devices": [
     {
       "key": "test-shelly",
-      "name": "Test-Shelly",
-      "enabled": true
+      "name": "Licht Heustock vorne",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Heustock vorne",
+        "style": "left:71.4%; top:21.9%; width:8.2%; height:53.7%;"
+      }
     },
     {
       "key": "platzlampe",
-      "name": "Platzlampe",
-      "enabled": true
+      "name": "Licht Hausplatz",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Hausplatz",
+        "style": "left:16.6%; top:0.4%; width:53.7%; height:15.2%;"
+      }
     },
     {
       "key": "scheune-vorne",
       "name": "Licht Scheune vorne",
-      "enabled": true
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Scheune vorne",
+        "style": "left:60.8%; top:17.4%; width:9.4%; height:58.7%;"
+      }
     },
     {
       "key": "scheune-hinten",
       "name": "Licht Scheune hinten",
-      "enabled": true
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Scheune hinten",
+        "style": "left:29.3%; top:17.6%; width:11.8%; height:58.9%;"
+      }
     },
     {
       "key": "heustock-mitte",
-      "name": "Heustock mitte",
-      "enabled": true
+      "name": "Licht Heustock mitte",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Heustock mitte",
+        "style": "left:41.4%; top:17.6%; width:18.9%; height:58.9%;"
+      }
+    },
+    {
+      "key": "zisterne",
+      "name": "Licht Zisterne",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Zisterne",
+        "style": "left:28.3%; top:76.8%; width:28.8%; height:19.6%;"
+      }
     }
   ]
 }

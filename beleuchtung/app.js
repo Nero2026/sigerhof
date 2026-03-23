@@ -1,4 +1,5 @@
 const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
+const DEVICES_CONFIG_URL = new URL("./devices.json", import.meta.url)
 const POLL_MS = 3000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
@@ -16,6 +17,89 @@ const channel =
 let inFlight = false
 let isSwitching = false
 let pollingTimer = null
+
+function normalizeDevicesConfig(payload) {
+  const list = Array.isArray(payload?.devices) ? payload.devices : []
+  return list
+    .map((device) => ({
+      key: String(device?.key || "").trim(),
+      name: String(device?.name || "").trim(),
+      enabled: device?.enabled !== false,
+      controllable: device?.controllable !== false,
+      graphic: {
+        ariaLabel: String(device?.graphic?.ariaLabel || "").trim(),
+        style: String(device?.graphic?.style || "").trim()
+      }
+    }))
+    .filter((device) => device.key && device.name && device.enabled)
+}
+
+async function loadDevicesConfig() {
+  const res = await fetchWithTimeout(DEVICES_CONFIG_URL, REQUEST_TIMEOUT_MS, { method: "GET" })
+  if (!res.ok) {
+    throw new Error(`config_http_${res.status}`)
+  }
+
+  return normalizeDevicesConfig(await res.json())
+}
+
+function renderDeviceList(devices) {
+  const container = document.getElementById("deviceList")
+  if (!container) return
+
+  container.innerHTML = ""
+
+  for (const device of devices) {
+    const button = document.createElement("button")
+    button.className = "switchBtn switchOff"
+    button.dataset.deviceKey = device.key
+    button.type = "button"
+    button.textContent = device.name
+    button.setAttribute("aria-label", device.name)
+    if (!device.controllable) {
+      button.disabled = true
+      button.title = "Noch nicht mit dem Worker verbunden."
+      button.setAttribute("aria-description", "Noch nicht mit dem Worker verbunden.")
+    }
+    container.appendChild(button)
+  }
+}
+
+function renderPlanRegions(devices) {
+  const container = document.getElementById("planRegions")
+  if (!container) return
+
+  container.innerHTML = ""
+
+  for (const device of devices) {
+    if (!device.graphic.style) continue
+
+    const button = document.createElement("button")
+    button.className = "regionBtn"
+    button.dataset.deviceKey = device.key
+    button.type = "button"
+    button.style.cssText = device.graphic.style
+    button.setAttribute("aria-label", device.graphic.ariaLabel || device.name)
+    if (!device.controllable) {
+      button.disabled = true
+      button.title = "Noch nicht mit dem Worker verbunden."
+      button.setAttribute("aria-description", "Noch nicht mit dem Worker verbunden.")
+    }
+    container.appendChild(button)
+  }
+}
+
+function showConfigError(message) {
+  const list = document.getElementById("deviceList")
+  if (list) {
+    list.innerHTML = `<div class="sub">${message}</div>`
+  }
+
+  const regions = document.getElementById("planRegions")
+  if (regions) {
+    regions.innerHTML = ""
+  }
+}
 
 function registerControls() {
   const elements = document.querySelectorAll("[data-device-key]")
@@ -393,20 +477,33 @@ if (channel) {
   })
 }
 
-registerControls()
-hydrateStateCache()
-hydrateLastEvent()
-updateButtonsEnabled()
-pollOnce()
-startPolling()
+async function init() {
+  try {
+    const devices = await loadDevicesConfig()
+    renderDeviceList(devices)
+    renderPlanRegions(devices)
+  } catch {
+    showConfigError("Geraeteliste konnte nicht geladen werden.")
+    return
+  }
 
-window.addEventListener("pageshow", () => {
+  registerControls()
+  hydrateStateCache()
+  hydrateLastEvent()
   updateButtonsEnabled()
   pollOnce()
-})
+  startPolling()
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") return
-  updateButtonsEnabled()
-  pollOnce()
-})
+  window.addEventListener("pageshow", () => {
+    updateButtonsEnabled()
+    pollOnce()
+  })
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return
+    updateButtonsEnabled()
+    pollOnce()
+  })
+}
+
+init()
