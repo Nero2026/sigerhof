@@ -53,6 +53,15 @@
         "ariaLabel": "Heustock mitte",
         "style": "left:41.1%; top:16.8%; width:19.3%; height:59.4%;"
       }
+    },
+    {
+      "key": "werkstatt",
+      "name": "Licht Werkstatt",
+      "enabled": true,
+      "graphic": {
+        "ariaLabel": "Werkstatt",
+        "style": "left:70.4%; top:16.6%; width:9.4%; height:59.0%;"
+      }
     }
   ]
 }
