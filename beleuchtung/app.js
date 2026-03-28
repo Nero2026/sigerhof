@@ -1,12 +1,116 @@
 const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
-const DEVICES_CONFIG_URL = new URL("./devices.json", import.meta.url)
+const DEVICES_CONFIG_URL = "./devices.json?v=20260328a"
 const POLL_MS = 3000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
 const STATE_EVENT_KEY = "sigerhof:beleuchtung:state"
 const STATE_CACHE_KEY = "sigerhof:beleuchtung:state-cache"
 const CHANNEL_NAME = "sigerhof-beleuchtung-sync"
+const FLOOR_STORAGE_KEY = "sigerhof:beleuchtung:floor"
 const INSTANCE_ID = `${Date.now()}-${Math.random().toString(16).slice(2)}`
+const PLAN_FLOORS = {
+  eg: {
+    image: "Grundriss_EG.PNG",
+    alt: "Grundriss Sigerhof Erdgeschoss",
+    aspectRatio: "1103 / 575",
+    label: "Erdgeschoss"
+  },
+  og: {
+    image: "Grundriss_OG.PNG",
+    alt: "Grundriss Sigerhof Obergeschoss",
+    aspectRatio: "1100 / 579",
+    label: "Obergeschoss"
+  }
+}
+const DEFAULT_DEVICES_CONFIG = {
+  devices: [
+    {
+      key: "platzlampe",
+      name: "Licht Hausplatz",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Hausplatz", style: "left:17.8%; top:2.8%; width:52.7%; height:13.9%;" },
+          { floor: "og", ariaLabel: "Hausplatz", style: "left:18.1%; top:2.8%; width:52.7%; height:13.9%;" }
+        ]
+      }
+    },
+    {
+      key: "zisterne",
+      name: "Licht Zisterne",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Zisterne", style: "left:29.8%; top:78.3%; width:26.7%; height:18.4%;" },
+          { floor: "og", ariaLabel: "Zisterne", style: "left:30.2%; top:78.1%; width:26.7%; height:18.3%;" }
+        ]
+      }
+    },
+    {
+      key: "stall",
+      name: "Licht Stall",
+      enabled: true,
+      controllable: false,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Stall", style: "left:42.0%; top:18.6%; width:17.4%; height:57.4%;" }
+        ]
+      }
+    },
+    {
+      key: "scheune-vorne",
+      name: "Licht Scheune vorne",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Rossstall", style: "left:17.6%; top:18.4%; width:11.5%; height:14.4%;" }
+        ]
+      }
+    },
+    {
+      key: "scheune-hinten",
+      name: "Licht Scheune hinten",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Scheune hinten", style: "left:30.1%; top:18.3%; width:10.8%; height:25.9%;" },
+          { floor: "eg", ariaLabel: "Scheune hinten", style: "left:60.5%; top:18.6%; width:9.3%; height:25.9%;" }
+        ]
+      }
+    },
+    {
+      key: "test-shelly",
+      name: "Licht Heustock vorne",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "og", ariaLabel: "Heustock vorne", style: "left:71.0%; top:19.2%; width:8.3%; height:56.6%;" }
+        ]
+      }
+    },
+    {
+      key: "heustock-mitte",
+      name: "Licht Heustock mitte",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Saegewerk", style: "left:30.1%; top:50.3%; width:10.9%; height:25.9%;" },
+          { floor: "og", ariaLabel: "Heustock mitte", style: "left:42.4%; top:18.8%; width:17.5%; height:57.0%;" }
+        ]
+      }
+    },
+    {
+      key: "werkstatt",
+      name: "Licht Werkstatt",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "eg", ariaLabel: "Werkstatt", style: "left:57.5%; top:78.3%; width:21.0%; height:17.6%;" }
+        ]
+      }
+    }
+  ]
+}
 
 const deviceElements = new Map()
 const deviceState = new Map()
@@ -17,30 +121,67 @@ const channel =
 let inFlight = false
 let isSwitching = false
 let pollingTimer = null
+let currentFloor = getInitialFloor()
+
+function getInitialFloor() {
+  try {
+    const savedFloor = String(localStorage.getItem(FLOOR_STORAGE_KEY) || "").trim().toLowerCase()
+    if (savedFloor && PLAN_FLOORS[savedFloor]) {
+      return savedFloor
+    }
+  } catch {
+    // Ignore local storage access issues.
+  }
+
+  return "eg"
+}
 
 function normalizeDevicesConfig(payload) {
   const list = Array.isArray(payload?.devices) ? payload.devices : []
   return list
-    .map((device) => ({
-      key: String(device?.key || "").trim(),
-      name: String(device?.name || "").trim(),
-      enabled: device?.enabled !== false,
-      controllable: device?.controllable !== false,
-      graphic: {
-        ariaLabel: String(device?.graphic?.ariaLabel || "").trim(),
-        style: String(device?.graphic?.style || "").trim()
+    .map((device) => {
+      const rawRegions = Array.isArray(device?.graphic?.regions) ? device.graphic.regions : []
+      const fallbackRegion =
+        rawRegions.length > 0
+          ? []
+          : [
+              {
+                floor: String(device?.graphic?.floor || "eg").trim().toLowerCase(),
+                ariaLabel: String(device?.graphic?.ariaLabel || "").trim(),
+                style: String(device?.graphic?.style || "").trim()
+              }
+            ]
+
+      const regions = [...rawRegions, ...fallbackRegion]
+        .map((region) => ({
+          floor: String(region?.floor || "eg").trim().toLowerCase(),
+          ariaLabel: String(region?.ariaLabel || device?.name || "").trim(),
+          style: String(region?.style || "").trim()
+        }))
+        .filter((region) => region.style && PLAN_FLOORS[region.floor])
+
+      return {
+        key: String(device?.key || "").trim(),
+        name: String(device?.name || "").trim(),
+        enabled: device?.enabled !== false,
+        controllable: device?.controllable !== false,
+        graphic: { regions }
       }
-    }))
+    })
     .filter((device) => device.key && device.name && device.enabled)
 }
 
 async function loadDevicesConfig() {
-  const res = await fetchWithTimeout(DEVICES_CONFIG_URL, REQUEST_TIMEOUT_MS, { method: "GET" })
-  if (!res.ok) {
-    throw new Error(`config_http_${res.status}`)
-  }
+  try {
+    const res = await fetchWithTimeout(DEVICES_CONFIG_URL, REQUEST_TIMEOUT_MS, { method: "GET" })
+    if (!res.ok) {
+      throw new Error(`config_http_${res.status}`)
+    }
 
-  return normalizeDevicesConfig(await res.json())
+    return normalizeDevicesConfig(await res.json())
+  } catch {
+    return normalizeDevicesConfig(DEFAULT_DEVICES_CONFIG)
+  }
 }
 
 function renderDeviceList(devices) {
@@ -72,20 +213,34 @@ function renderPlanRegions(devices) {
   container.innerHTML = ""
 
   for (const device of devices) {
-    if (!device.graphic.style) continue
+    const matchingRegions = Array.isArray(device.graphic?.regions)
+      ? device.graphic.regions.filter((region) => region.floor === currentFloor)
+      : []
 
-    const button = document.createElement("button")
-    button.className = "regionBtn"
-    button.dataset.deviceKey = device.key
-    button.type = "button"
-    button.style.cssText = device.graphic.style
-    button.setAttribute("aria-label", device.graphic.ariaLabel || device.name)
-    if (!device.controllable) {
-      button.disabled = true
-      button.title = "Noch nicht mit dem Worker verbunden."
-      button.setAttribute("aria-description", "Noch nicht mit dem Worker verbunden.")
+    for (const region of matchingRegions) {
+      const button = document.createElement("button")
+      button.className = "regionBtn"
+      button.dataset.deviceKey = device.key
+      button.type = "button"
+      button.style.cssText = region.style
+      button.setAttribute("aria-label", region.ariaLabel || device.name)
+      if (!device.controllable) {
+        button.disabled = true
+        button.title = "Noch nicht mit dem Worker verbunden."
+        button.setAttribute("aria-description", "Noch nicht mit dem Worker verbunden.")
+      }
+      container.appendChild(button)
     }
-    container.appendChild(button)
+  }
+}
+
+function updateFloorButtons() {
+  const buttons = document.querySelectorAll("[data-floor]")
+  for (const button of buttons) {
+    const floor = String(button.dataset.floor || "").trim().toLowerCase()
+    const isActive = floor === currentFloor
+    button.classList.toggle("active", isActive)
+    button.setAttribute("aria-pressed", isActive ? "true" : "false")
   }
 }
 
@@ -99,6 +254,56 @@ function showConfigError(message) {
   if (regions) {
     regions.innerHTML = ""
   }
+}
+
+function updatePlanImage() {
+  const planRoot = document.getElementById("planRoot")
+  const planImage = document.getElementById("planImage")
+  const floorBadgeText = document.getElementById("floorBadgeText")
+  const floorConfig = PLAN_FLOORS[currentFloor]
+  if (!planRoot || !planImage || !floorConfig) return
+
+  planRoot.style.setProperty("--plan-aspect-ratio", floorConfig.aspectRatio)
+  planImage.src = floorConfig.image
+  planImage.alt = floorConfig.alt
+  if (floorBadgeText) {
+    floorBadgeText.textContent = `Aktive Ansicht: ${floorConfig.label}`
+  }
+}
+
+function setCurrentFloor(nextFloor, devices) {
+  const floor = String(nextFloor || "").trim().toLowerCase()
+  if (!PLAN_FLOORS[floor] || floor === currentFloor) return
+
+  currentFloor = floor
+  try {
+    localStorage.setItem(FLOOR_STORAGE_KEY, currentFloor)
+  } catch {
+    // Ignore local storage access issues.
+  }
+
+  deviceElements.clear()
+  updateFloorButtons()
+  updatePlanImage()
+  renderPlanRegions(devices)
+  registerControls()
+  hydrateStateCache()
+  hydrateLastEvent()
+  updateButtonsEnabled()
+}
+
+function registerFloorSwitching(devices) {
+  const buttons = document.querySelectorAll("[data-floor]")
+  if (!buttons.length) return
+
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      setCurrentFloor(button.dataset.floor, devices)
+    })
+  }
+
+  updateFloorButtons()
+  updatePlanImage()
 }
 
 function registerControls() {
@@ -478,9 +683,11 @@ if (channel) {
 }
 
 async function init() {
+  let devices
   try {
-    const devices = await loadDevicesConfig()
+    devices = await loadDevicesConfig()
     renderDeviceList(devices)
+    registerFloorSwitching(devices)
     renderPlanRegions(devices)
   } catch {
     showConfigError("Geraeteliste konnte nicht geladen werden.")

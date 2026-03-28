@@ -1,19 +1,39 @@
-﻿{
-    "devices":  [
-                    {
-                        "key":  "test-shelly",
-                        "name":  "Test-Shelly",
-                        "enabled":  true
-                    },
-                    {
-                        "key":  "platzlampe",
-                        "name":  "Platzlampe",
-                        "enabled":  true
-                    },
-                    {
-                        "key":  "scheune-vorne",
-                        "name":  "Licht Scheune vorne",
-                        "enabled":  true
-                    }
-                ]
+{
+    "devices": [
+        {
+            "key": "test-shelly",
+            "name": "Test-Shelly",
+            "enabled": true
+        },
+        {
+            "key": "platzlampe",
+            "name": "Platzlampe",
+            "enabled": true
+        },
+        {
+            "key": "scheune-vorne",
+            "name": "Licht Scheune vorne",
+            "enabled": true
+        },
+        {
+            "key": "scheune-hinten",
+            "name": "Licht Scheune hinten",
+            "enabled": true
+        },
+        {
+            "key": "heustock-mitte",
+            "name": "Heustock mitte",
+            "enabled": true
+        },
+        {
+            "key": "zisterne",
+            "name": "Licht Zisterne",
+            "enabled": true
+        },
+        {
+            "key": "werkstatt",
+            "name": "Licht Werkstatt",
+            "enabled": true
+        }
+    ]
 }
