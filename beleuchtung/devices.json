@@ -9,7 +9,7 @@
           {
             "floor": "eg",
             "ariaLabel": "Hausplatz",
-            "style": "left:17.8%; top:2.8%; width:52.7%; height:13.9%;"
+            "style": "left:17.6%; top:3.3%; width:53.1%; height:13.9%;"
           },
           {
             "floor": "og",
@@ -20,39 +20,16 @@
       }
     },
     {
-      "key": "zisterne",
-      "name": "Licht Zisterne",
+      "key": "rossstall",
+      "name": "Licht Rossstall",
       "enabled": true,
-      "graphic": {
-        "regions": [
-          {
-            "floor": "eg",
-            "ariaLabel": "Zisterne",
-            "style": "left:29.8%; top:78.3%; width:26.7%; height:18.4%;"
-          },
-          {
-            "floor": "og",
-            "ariaLabel": "Zisterne",
-            "style": "left:30.2%; top:78.1%; width:26.7%; height:18.3%;"
-          }
-        ]
-      }
-    },
-    {
-      "key": "scheune-vorne",
-      "name": "Licht Scheune vorne",
-      "enabled": true,
+      "controllable": false,
       "graphic": {
         "regions": [
           {
             "floor": "eg",
             "ariaLabel": "Rossstall",
-            "style": "left:17.6%; top:18.4%; width:11.5%; height:14.4%;"
-          },
-          {
-            "floor": "eg",
-            "ariaLabel": "Stall",
-            "style": "left:42.0%; top:18.6%; width:17.5%; height:57.6%;"
+            "style": "left:17.4%; top:18.9%; width:11.6%; height:14.4%;"
           }
         ]
       }
@@ -66,12 +43,97 @@
           {
             "floor": "eg",
             "ariaLabel": "Scheune hinten",
-            "style": "left:30.1%; top:18.3%; width:10.8%; height:25.9%;"
-          },
+            "style": "left:30.0%; top:18.8%; width:10.9%; height:25.9%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "stall",
+      "name": "Licht Stall",
+      "enabled": true,
+      "graphic": {
+        "regions": [
           {
             "floor": "eg",
-            "ariaLabel": "Scheune hinten",
-            "style": "left:60.5%; top:18.6%; width:9.3%; height:25.9%;"
+            "ariaLabel": "Stall",
+            "style": "left:42.0%; top:19.1%; width:17.6%; height:57.3%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "scheune-vorne",
+      "name": "Licht Scheune vorne",
+      "enabled": true,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "eg",
+            "ariaLabel": "Scheune vorne",
+            "style": "left:60.6%; top:19.1%; width:9.3%; height:25.9%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "saegewerk",
+      "name": "Licht Sägewerk",
+      "enabled": true,
+      "controllable": false,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "eg",
+            "ariaLabel": "Sägewerk",
+            "style": "left:30.0%; top:50.7%; width:11.0%; height:25.9%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "zisterne",
+      "name": "Licht Zisterne",
+      "enabled": true,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "eg",
+            "ariaLabel": "Zisterne",
+            "style": "left:29.7%; top:78.6%; width:27.0%; height:18.6%;"
+          },
+          {
+            "floor": "og",
+            "ariaLabel": "Zisterne",
+            "style": "left:30.2%; top:78.1%; width:26.8%; height:18.5%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "werkstatt",
+      "name": "Licht Werkstatt",
+      "enabled": true,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "eg",
+            "ariaLabel": "Werkstatt",
+            "style": "left:57.6%; top:78.6%; width:21.3%; height:17.7%;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "heustock-mitte",
+      "name": "Licht Heustock mitte",
+      "enabled": true,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "og",
+            "ariaLabel": "Heustock mitte",
+            "style": "left:42.4%; top:18.8%; width:17.5%; height:57.0%;"
           }
         ]
       }
@@ -86,39 +148,6 @@
             "floor": "og",
             "ariaLabel": "Heustock vorne",
             "style": "left:71.0%; top:19.2%; width:8.3%; height:56.6%;"
-          }
-        ]
-      }
-    },
-    {
-      "key": "heustock-mitte",
-      "name": "Licht Heustock mitte",
-      "enabled": true,
-      "graphic": {
-        "regions": [
-          {
-            "floor": "eg",
-            "ariaLabel": "Sägewerk",
-            "style": "left:30.1%; top:50.3%; width:10.9%; height:25.9%;"
-          },
-          {
-            "floor": "og",
-            "ariaLabel": "Heustock mitte",
-            "style": "left:42.4%; top:18.8%; width:17.5%; height:57.0%;"
-          }
-        ]
-      }
-    },
-    {
-      "key": "werkstatt",
-      "name": "Licht Werkstatt",
-      "enabled": true,
-      "graphic": {
-        "regions": [
-          {
-            "floor": "eg",
-            "ariaLabel": "Werkstatt",
-            "style": "left:57.5%; top:78.3%; width:21.0%; height:17.6%;"
           }
         ]
       }

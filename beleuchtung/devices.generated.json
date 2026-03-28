@@ -11,6 +11,11 @@
             "enabled": true
         },
         {
+            "key": "stall",
+            "name": "Licht Stall",
+            "enabled": true
+        },
+        {
             "key": "scheune-vorne",
             "name": "Licht Scheune vorne",
             "enabled": true
