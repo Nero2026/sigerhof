@@ -1,5 +1,5 @@
 const PROXY_URL = "https://beleuchtung-secure-worker.remo-bossart.workers.dev"
-const DEVICES_CONFIG_URL = "./devices.json?v=20260328a"
+const DEVICES_CONFIG_URL = "./devices.json?v=20260406a"
 const POLL_MS = 3000
 const REQUEST_TIMEOUT_MS = 7000
 const CLICK_DEBOUNCE_MS = 600
@@ -39,7 +39,6 @@ const DEFAULT_DEVICES_CONFIG = {
       key: "rossstall",
       name: "Licht Rossstall",
       enabled: true,
-      controllable: false,
       graphic: {
         regions: [
           { floor: "eg", ariaLabel: "Rossstall", style: "left:17.4%; top:18.9%; width:11.6%; height:14.4%;" }
@@ -109,6 +108,16 @@ const DEFAULT_DEVICES_CONFIG = {
       }
     },
     {
+      key: "werkstatt-oben",
+      name: "Licht Werkstatt oben",
+      enabled: true,
+      graphic: {
+        regions: [
+          { floor: "og", ariaLabel: "Werkstatt oben", style: "left:57.3%; top:77.0%; width:22.2%; height:20.3%;" }
+        ]
+      }
+    },
+    {
       key: "heustock-mitte",
       name: "Licht Heustock mitte",
       enabled: true,
@@ -119,7 +128,7 @@ const DEFAULT_DEVICES_CONFIG = {
       }
     },
     {
-      key: "test-shelly",
+      key: "heustock-vorne",
       name: "Licht Heustock vorne",
       enabled: true,
       graphic: {

@@ -23,7 +23,6 @@
       "key": "rossstall",
       "name": "Licht Rossstall",
       "enabled": true,
-      "controllable": false,
       "graphic": {
         "regions": [
           {
@@ -125,6 +124,20 @@
       }
     },
     {
+      "key": "werkstatt-oben",
+      "name": "Licht Werkstatt oben",
+      "enabled": true,
+      "graphic": {
+        "regions": [
+          {
+            "floor": "og",
+            "ariaLabel": "Werkstatt oben",
+            "style": "left:57.3%; top:77.0%; width:22.2%; height:20.3%;"
+          }
+        ]
+      }
+    },
+    {
       "key": "heustock-mitte",
       "name": "Licht Heustock mitte",
       "enabled": true,
@@ -139,7 +152,7 @@
       }
     },
     {
-      "key": "test-shelly",
+      "key": "heustock-vorne",
       "name": "Licht Heustock vorne",
       "enabled": true,
       "graphic": {

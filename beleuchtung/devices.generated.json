@@ -1,13 +1,18 @@
 {
     "devices": [
         {
-            "key": "test-shelly",
-            "name": "Test-Shelly",
+            "key": "heustock-vorne",
+            "name": "Licht Heustock vorne",
             "enabled": true
         },
         {
             "key": "platzlampe",
             "name": "Platzlampe",
+            "enabled": true
+        },
+        {
+            "key": "rossstall",
+            "name": "Licht Rossstall",
             "enabled": true
         },
         {
@@ -38,6 +43,11 @@
         {
             "key": "werkstatt",
             "name": "Licht Werkstatt",
+            "enabled": true
+        },
+        {
+            "key": "werkstatt-oben",
+            "name": "Licht Werkstatt oben",
             "enabled": true
         }
     ]
